@@ -25,9 +25,9 @@ In this case, we need that `core` library to survive when deploying the `web` an
 
 ## Development Setup & Testing
 1. Create some local directories to mirror the Heroku `build`, `cache`, and `env` buildpack directory. On my machine, it looks like:
-    1. Build: `/Users/developer/dev/node-subdir-heroku-buildpack/.test/build`
-    1. Cache: `/Users/developer/dev/node-subdir-heroku-buildpack/.test/cache`
-    1. Env: `/Users/developer/dev/node-subdir-heroku-buildpack/.test/env`
+    - Build: `/Users/developer/dev/node-subdir-heroku-buildpack/.test/build`
+    - Cache: `/Users/developer/dev/node-subdir-heroku-buildpack/.test/cache`
+    - Env: `/Users/developer/dev/node-subdir-heroku-buildpack/.test/env`
 1. Copy your repository into your configured `build` directory.
 1. Create `BUILDPACK_START` and `BUILDPACK_KEEP` files in your `env` buildpack directory. The contents of each file should be the values you want the buildpack to use.
 1. While testing, it is recommended to create a `BUILDPACK_DEV` file in the `env` buildpack directory as well to disable the normal cleaning process. If you don't do this, you will have to clear out & re-copy your repository files in the `test/build` directory after each test.
