@@ -1,7 +1,7 @@
 # space150 node-subdir Heroku Buildpack
 Inspired by the awesome [timanovsky/subdir-heroku-buildpack](https://github.com/timanovsky/subdir-heroku-buildpack) project. We created this buildpack because we often have projects that require *multiple* directories, and Tim's project only supported keeping a single directory. We also need to handle some additional `package.json` tweaking that is specific to Node.js & Heroku.
 
-As an example, consider the following single repository structure:
+As an example, consider the following repository structure:
 - `/`
   - `core/` Contains a shared codebase that is used by both the `web` and `admin` projects.
   - `web/` Contains the project for serving a headless public website. Dependent on the `core` project.
