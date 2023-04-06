@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+
+shopt -s dotglob # Ensure wildcards in globs match dotfiles too.
+
+# https://deventer.heroku.com/articles/buildpack-api for details on how Heroku buildpacks work.
+BUILD_DIR=${1:-} # The directory to modify. /Users/developer/dev/.temp/build
+CACHE_DIR=${2:-} # Artifact cache directory between builds. /Users/developer/dev/.temp/cache
+ENV_DIR=${3:-} # Directory containing plain-text files named after the Heroku config variables. Contents of eah file are the values of the variables. # /Users/developer/dev/.temp/env
+
+if [ -f $ENV_DIR/BUILDPACK_START ]; then
+  BUILDPACK_START=`cat $ENV_DIR/BUILDPACK_START`
+fi
+
+if [ -z "$BUILDPACK_START" ]; then
+  echo "BUILDPACK_START must be defined"
+  exit 1
+fi
+
+if [ -f $ENV_DIR/BUILDPACK_KEEP ]; then
+  BUILDPACK_KEEP=`cat $ENV_DIR/BUILDPACK_KEEP`
+fi
+
+if [ -z "$BUILDPACK_KEEP" ]; then
+  echo "BUILDPACK_KEEP must be defined"
+  exit 1
+fi
+
+echo "-----> space150 Node.js Subdir Buildpack"
+echo "       Config:"
+echo "              BUILDPACK_START='$BUILDPACK_START'"
+echo "              BUILDPACK_KEEP='$BUILDPACK_KEEP'"
+mkdir -p $CACHE_DIR
+echo "       Created root cache directory."
+
+TEMP_DIRECTORY=`mktemp -d $CACHE_DIR/XXXXXXXX`
+echo "       Created artifact directory at '$TEMP_DIRECTORY'" 
+
+if [ ! -d "$BUILD_DIR/$BUILDPACK_START" ]; then
+  echo "Unable to find BUILDPACK_START directory at '$BUILD_DIR/$BUILDPACK_START'"
+  exit 1
+fi
+
+PACKAGE_JSON_PATH="$BUILD_DIR/$BUILDPACK_START/package.json"
+echo "       Looking up Node.js engine version from '$PACKAGE_JSON_PATH'..."
+NODE_VERSION=$(awk -F'"' '/"node": ".+"/{ print $4; exit; }' "$PACKAGE_JSON_PATH")
+
+ENGINES_JSON=''
+if [ -z "$NODE_VERSION" ]; then
+  echo "       No Node.js version found. Heroku will choose a default."
+else
+  echo "       Detected Node.js version $NODE_VERSION"
+  ENGINES_JSON="
+  \"engines\": {
+    \"node\": \"${NODE_VERSION}\"
+  },"
+fi
+
+echo "       Creating package.json pointing to '$BUILDPACK_START'..."
+echo "{
+  \"name\": \"node-subdir-heroku-buildpack\",
+  \"version\": \"1.0.0\",
+  \"private\": \"true\",${ENGINES_JSON}
+  \"scripts\": {
+    \"build\": \"cd ./${BUILDPACK_START} && npm install && npm run build\",
+    \"start\": \"cd ./${BUILDPACK_START} && npm run start\"
+  }
+}" >> "$TEMP_DIRECTORY/package.json"
+echo "       package.json created."
+
+IFS=';'
+for KEEP_PATH in $BUILDPACK_KEEP; do
+  if [ ! -d $BUILD_DIR/$KEEP_PATH ]; then
+    echo "Path '$KEEP_PATH' does not exist in the build directory"
+    exit 1
+  fi
+
+  echo "       Copying '$KEEP_PATH' to artifact directory..."
+  cp -R $BUILD_DIR/$KEEP_PATH/. $TEMP_DIRECTORY/$KEEP_PATH
+  echo "       Path copied."
+done
+
+# <cleanup>
+if [ -f $ENV_DIR/BUILDPACK_DEV ]; then
+  echo "       BUILDPACK_DEV found. Skipping clean."
+else 
+  echo "       Cleaning build directory..."
+  rm -rf $BUILD_DIR/*
+  echo "       Build directory cleaned."
+
+  echo "       Copying artifact from '$TMP_DIR' to build directory..."
+  cp -R $TEMP_DIRECTORY/. $BUILD_DIR/
+  echo "       Artifact copied."
+
+  echo "       Cleaning artifact directory..."
+  rm -rf $TEMP_DIRECTORY
+  echo "       Artifact directory cleaned."
+fi
+# </cleanup>
+
+echo "       Finished."
+exit 0

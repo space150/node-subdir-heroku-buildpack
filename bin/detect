@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# bin/detect <build-dir>
+
+echo "space150 Node.js Subdir Buildpack"
+exit 0
