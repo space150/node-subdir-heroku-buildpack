@@ -20,7 +20,7 @@ In this case, we need that `core` library to survive when deploying the `web` an
 1. Creates a new `package.json` file on the root of the build artifact that delegates the `build` and `start` commands to the configured `BUILDPACK_START` directory. The buildpack also attempts to set the `{ engines: { node }}` value in this new root `package.json` file to match whatever is entered in your `BUILDPACK_START/package.json` file.
 1. Takes the configured `BUILDPACK_KEEP` directories and copies them to the root of the build artifact.
 1. Deletes everything in the Heroku build directory.
-1. Copies the build artifact into the Heroku build directory.
+1. Copies the build artifact into the now-empty Heroku build directory.
 1. Deletes the build artifact, leaving the final files in the Heroku build directory.
 
 ## Development Setup & Testing
