@@ -12,8 +12,8 @@ In this case, we need that `core` library to survive when deploying the `web` an
 ## Heroku Setup
 1. Have your repository mirror the directory structure referenced above. The exact folder names are not important; you can name them however you like.
 1. Log into Heroku & create two Heroku Config Vars in your project:
-  1. `BUILDPACK_START` points to the directory in your repository that contains the `package.json` to run. This config allows Heroku to be configured to launch one of many projects in the repository. In our example above, this would get set to `admin` for the admin project, and `web` for the public project.
-  1. `BUILDPACK_KEEP` is a `;`-delimited list that includes all of the directories to retain. In our example case above, to configure the `public` site this would get set to `web;core`. On the `admin` site, this would get set to `admin;core`.
+    - `BUILDPACK_START` points to the directory in your repository that contains the `package.json` to run. This config allows Heroku to be configured to launch one of many projects in the repository. In our example above, this would get set to `admin` for the admin project, and `web` for the public project.
+    - `BUILDPACK_KEEP` is a `;`-delimited list that includes all of the directories to retain. In our example case above, to configure the `public` site this would get set to `web;core`. On the `admin` site, this would get set to `admin;core`.
 1. Set this buildpack as the first item in the buildpack chain. Paste in the Git URL `https://github.com/space150/node-subdir-heroku-buildpack.git`. We recommend appending a specific commit hash to this Git URL so that any future changes we make to the `main` branch do not impact your project. We fully reserve the right to make breaking changes at any time without any advance warning or notification.
 
 ## How it works
