@@ -55,6 +55,13 @@ else
   },"
 fi
 
+PROCFILE_PATH="$BUILD_DIR/$BUILDPACK_START/Procfile"
+if [ -f $PROCFILE_PATH ]; then
+  echo "       Moving Procfile to root..."
+  mv $PROCFILE_PATH $TEMP_DIRECTORY/Procfile
+  echo "       Procfile moved."
+fi
+
 echo "       Creating package.json pointing to '$BUILDPACK_START'..."
 echo "{
   \"name\": \"node-subdir-heroku-buildpack\",

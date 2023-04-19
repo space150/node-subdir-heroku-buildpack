@@ -11,6 +11,7 @@ In this case, we need that `core` library to survive when deploying the `web` an
 
 ## Heroku Setup
 1. Have your repository mirror the directory structure referenced above. The exact folder names are not important; you can name them however you like.
+1. Make sure your projects `package.json` all have a `build` and `start` script entered. They can be empty, but they must exist.
 1. Log into Heroku & create two Heroku Config Vars in your project:
     - `BUILDPACK_START` points to the directory in your repository that contains the `package.json` to run. This config allows Heroku to be configured to launch one of many projects in the repository. In our example above, this would get set to `admin` for the admin project, and `web` for the public project.
     - `BUILDPACK_KEEP` is a `;`-delimited list that includes all of the directories to retain. In our example case above, to configure the `public` site this would get set to `web;core`. On the `admin` site, this would get set to `admin;core`.
