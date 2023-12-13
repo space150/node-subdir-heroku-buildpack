@@ -15,6 +15,7 @@ In this case, we need that `core` library to survive when deploying the `web` an
 1. Log into Heroku & create two Heroku Config Vars in your project:
     - `BUILDPACK_START` points to the directory in your repository that contains the `package.json` to run. This config allows Heroku to be configured to launch one of many projects in the repository. In our example above, this would get set to `admin` for the admin project, and `web` for the public project.
     - `BUILDPACK_KEEP` is a `;`-delimited list that includes all of the directories to retain. In our example case above, to configure the `public` site this would get set to `web;core`. On the `admin` site, this would get set to `admin;core`.
+    - `BUILDPACK_BUILD_COMMAND` is optional. It defaults to `npm install && npm run build`, but can be overridden if your project has a specific command that needs to execute. After the `BUILDPACK_BUILD_COMMAND` is run, your app should be able to `npm run start`.
 1. Set this buildpack as the first item in the buildpack chain. Paste in the Git URL `https://github.com/space150/node-subdir-heroku-buildpack.git`. We recommend appending a specific commit hash to this Git URL so that any future changes we make to the `main` branch do not impact your project. We fully reserve the right to make breaking changes at any time without any advance warning or notification.
 
 ## How it works
@@ -31,6 +32,7 @@ In this case, we need that `core` library to survive when deploying the `web` an
     - Env: `/Users/developer/dev/node-subdir-heroku-buildpack/.test/env`
 1. Copy your repository into your configured `build` directory.
 1. Create `BUILDPACK_START` and `BUILDPACK_KEEP` files in your `env` buildpack directory. The contents of each file should be the values you want the buildpack to use.
-1. While testing, it is recommended to create a `BUILDPACK_DEV` file in the `env` buildpack directory as well to disable the normal cleaning process. If you don't do this, you will have to clear out & re-copy your repository files in the `test/build` directory after each test.
+1. While testing, it is recommended to create a `BUILDPACK_DEV` file in the `env` buildpack directory as well to disable the normal cleaning process. If you don't do this, you will have to clear out & re-copy your repository files in the `test/build` directory after each test, and on large repositories this can take significant time.
 1. Run the `./bin/compile` script passing in the paths to each of your buildpack directories. Here's how it looks on my machine: `sh ./bin/compile /Users/developer/dev/node-subdir-heroku-buildpack/.test/build /Users/developer/dev/node-subdir-heroku-buildpack/.test/cache /Users/developer/dev/node-subdir-heroku-buildpack/.test/env`
+  1. On Windows, you can use [CMDER]() to emulate the shell script. `sh ./bin/compile C:/dev/node-subdir-heroku-buildpack/.test/build C:/dev/node-subdir-heroku-buildpack/.test/cache C:/dev/node-subdir-heroku-buildpack/.test/env`
 1. Check the `build` or `cache` directory to verify that your edits worked.

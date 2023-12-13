@@ -25,10 +25,17 @@ if [ -z "$BUILDPACK_KEEP" ]; then
   exit 1
 fi
 
+if [ -f $ENV_DIR/BUILDPACK_BUILD_COMMAND ]; then
+  BUILDPACK_BUILD_COMMAND=`cat $ENV_DIR/BUILDPACK_BUILD_COMMAND`
+else
+  BUILDPACK_BUILD_COMMAND="npm install && npm run build"
+fi
+
 echo "-----> space150 Node.js Subdir Buildpack"
 echo "       Config:"
 echo "              BUILDPACK_START='$BUILDPACK_START'"
 echo "              BUILDPACK_KEEP='$BUILDPACK_KEEP'"
+echo "              BUILDPACK_BUILD_COMMAND='$BUILDPACK_BUILD_COMMAND'"
 mkdir -p $CACHE_DIR
 echo "       Created root cache directory."
 
@@ -68,7 +75,7 @@ echo "{
   \"version\": \"1.0.0\",
   \"private\": \"true\",${ENGINES_JSON}
   \"scripts\": {
-    \"build\": \"cd ./${BUILDPACK_START} && npm install && npm run build\",
+    \"build\": \"cd ./${BUILDPACK_START} && ${BUILDPACK_BUILD_COMMAND}\",
     \"start\": \"cd ./${BUILDPACK_START} && npm run start\"
   }
 }" >> "$TEMP_DIRECTORY/package.json"
